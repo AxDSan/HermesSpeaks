@@ -5,6 +5,10 @@
 Remove these announcement phrases. State the content directly.
 
 - "Here's the thing:"
+- "Here's what [X]"
+- "Here's this [X]"
+- "Here's that [X]"
+- "Here's why [X]"
 - "The uncomfortable truth is"
 - "It turns out"
 - "The real [X] is"
@@ -15,6 +19,8 @@ Remove these announcement phrases. State the content directly.
 - "Can we talk about"
 - "Here's what I find interesting"
 - "Here's the problem though"
+
+Any "here's what/this/that" construction is throat-clearing before the point. Cut it and state the point.
 
 ## Emphasis Crutches
 
@@ -44,16 +50,33 @@ Replace with plain language.
 | Circle back | Return to, revisit |
 | On the same page | Aligned, agreed |
 
-## Filler Adverbs
+## Adverbs
 
-Cut or replace:
+Kill all adverbs. No -ly words. No softeners, no intensifiers, no hedges.
+
+Specific offenders:
+
+- "really"
+- "just"
+- "literally"
+- "genuinely"
+- "honestly"
+- "simply"
+- "actually"
+- "deeply"
+- "truly"
+- "fundamentally"
+- "inherently"
+- "inevitably"
+- "interestingly"
+- "importantly"
+- "crucially"
+
+Also cut these filler phrases:
 
 - "At its core"
 - "In today's [X]"
 - "It's worth noting"
-- "Interestingly,"
-- "Importantly,"
-- "Crucially,"
 - "At the end of the day"
 - "When it comes to"
 - "In a world where"
@@ -61,7 +84,7 @@ Cut or replace:
 
 ## Meta-Commentary
 
-Remove self-referential asides:
+Remove self-referential asides. The essay should move, not announce its own structure.
 
 - "Hint:"
 - "Plot twist:" / "Spoiler:"
@@ -69,6 +92,11 @@ Remove self-referential asides:
 - "But that's another post"
 - "X is a feature, not a bug"
 - "Dressed up as"
+- "The rest of this essay explains..."
+- "Let me walk you through..."
+- "In this section, we'll..."
+- "As we'll see..."
+- "I want to explore..."
 
 ## Performative Emphasis
 
@@ -85,3 +113,16 @@ Announcing difficulty or significance rather than demonstrating it:
 - "This is genuinely hard"
 - "This is what leadership actually looks like"
 - "This is what X actually looks like"
+- "actually matters"
+
+## Vague Declaratives
+
+Sentences that announce importance without naming the specific thing. Kill these.
+
+- "The reasons are structural"
+- "The implications are significant"
+- "This is the deepest problem"
+- "The stakes are high"
+- "The consequences are real"
+
+If a sentence says something is important/deep/structural without showing the specific thing, cut it or replace it with the specific thing.
