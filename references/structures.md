@@ -63,6 +63,22 @@ These announce insight rather than deliver it.
 | "By the time X, I was Y." | Narrative template |
 | "X that isn't Y" | Indirect. Say "X is broken" |
 
+## False Agency
+
+Giving inanimate things human verbs. Complaints don't "become" fixes. Bets don't "live or die." Decisions don't "emerge." A person does something to make those things happen. AI loves this because it avoids naming the actor.
+
+| Pattern | Problem |
+|---------|---------|
+| "a complaint becomes a fix" | The complaint did nothing. Someone fixed it. |
+| "a bet lives or dies in days" | Bets don't have lifespans. Someone kills the project or ships it. |
+| "the decision emerges" | Decisions don't emerge. Someone decides. |
+| "the culture shifts" | Cultures don't shift on their own. People change behavior. |
+| "the conversation moves toward" | Conversations don't move. Someone steers. |
+| "the data tells us" | Data sits there. Someone reads it and draws a conclusion. |
+| "the market rewards" | Markets don't reward. Buyers pay for things. |
+
+**Instead:** Name the human. "The team fixed it that week" beats "the complaint becomes a fix." If no specific person fits, use "you" to put the reader in the seat.
+
 ## Narrator-from-a-Distance
 
 Floating above the scene instead of putting the reader in it.
