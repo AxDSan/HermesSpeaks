@@ -6,7 +6,7 @@ A skill for removing AI tells from prose.
 
 ## What this is
 
-AI writing has patterns. Predictable phrases, structures, rhythms. Once you notice them, you see them everywhere. This skill teaches Claude (or any LLM) to avoid them.
+AI writing has patterns. Predictable phrases, structures, rhythms. This skill teaches Claude (or any LLM) to catch and remove them.
 
 ## Skill Structure
 
@@ -33,11 +33,11 @@ stop-slop/
 
 ## What it catches
 
-**Banned phrases** — Throat-clearing openers, emphasis crutches, business jargon. See `references/phrases.md`.
+**Banned phrases** - Throat-clearing openers, emphasis crutches, business jargon, all adverbs, vague declaratives, meta-commentary. See `references/phrases.md`.
 
-**Structural clichés** — Binary contrasts, dramatic fragmentation, rhetorical setups. See `references/structures.md`.
+**Structural clichés** - Binary contrasts, negative listings, dramatic fragmentation, rhetorical setups, narrator-from-a-distance voice, passive voice. See `references/structures.md`.
 
-**Stylistic habits** — Tripling, immediate question-answers, metronomic endings.
+**Sentence-level rules** - No Wh- sentence starters, no em dashes, no staccato fragmentation, no lazy extremes, active voice required.
 
 ## Scoring
 
