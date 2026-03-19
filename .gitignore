@@ -1,0 +1,446 @@
+# =============================================================================
+# stop-slop-drop-top - AI Detection CLI Tool
+# =============================================================================
+# Comprehensive .gitignore for the AI detection testing project
+# Includes Node.js CLI, Next.js web app, Python nodriver automation, and Kilo agents
+# =============================================================================
+
+# =============================================================================
+# NODE.JS / NPM
+# =============================================================================
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables (local overrides)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Package lock files (use yarn or pnpm if preferred)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# npm/Node cache
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+
+# Bundle outputs
+*.bundle.js
+
+
+# =============================================================================
+# PYTHON / NODRIVER AUTOMATION
+# =============================================================================
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.venv3*/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# pytest / testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Ruff linter cache
+.ruff_cache/
+.ruff_cache.toml
+
+# pip and build artifacts
+pip-log.txt
+pip-delete-this-directory.txt
+*.wheel
+*.whl
+build/
+develop-eggs/
+eggs/
+.eggs/
+lib64/
+sdist/
+var/
+wheels/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+.ipynb_checkpoints
+
+
+# =============================================================================
+# NEXT.JS / WEB FRAMEWORK
+# =============================================================================
+# Next.js build output
+web/.next/
+next-env.d.ts
+next.config.js
+next.config.mjs
+next.config.ts
+
+# Vercel deployment
+web/.vercel/
+.vercel/
+.vercel.json
+
+# TypeScript build info
+web/tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Build outputs
+web/out/
+web/build/
+web/public/build/
+.web/
+
+# Storybook
+web/.storybook/build/
+web/storybook-static/
+
+# Turbopack
+.turbo/
+
+# React cache
+web/.cache/
+
+
+# =============================================================================
+# KILO / AI AGENT CONFIGURATION
+# =============================================================================
+# Kilo agent state and cache
+.kilocode/cache/
+.kilocode/state.json
+.kilocode/.env
+
+# Agent logs (may contain sensitive data)
+.kilocode/logs/
+*.agent.log
+
+# Skill cache
+.kilocode/skills/*/cache/
+.kilocode/skills/*/.temp/
+
+
+# =============================================================================
+# BROWSER AUTOMATION / STEALTH BROWSER
+# =============================================================================
+# Browser user data (contains cookies, sessions - security sensitive)
+user_data/
+.userdata/
+chromium_user_data/
+browser_profiles/
+
+# Element clone data (temporary browser automation output)
+element_clones/
+element_data/
+browser_snapshots/
+
+# MCP (Model Context Protocol) external projects
+stealth-browser-mcp/
+mcp-server-*/
+
+# Browser logs
+browser.log
+browser_debug.log
+*.har
+
+# CDP (Chrome DevTools Protocol) logs
+cdp_*.log
+
+
+# =============================================================================
+# DETECTION OUTPUTS / TEST RESULTS
+# =============================================================================
+# Temporary test output files
+test.txt
+test2.txt
+test3.txt
+test-write.txt
+test-output.txt
+*.test.txt
+
+# Browser detector outputs (cookie/session based - security sensitive)
+gptzero.txt
+zerogpt.txt
+winston.txt
+originality.txt
+Verte.txt
+detector_output.txt
+
+# Results and output directories
+results/
+output/
+outputs/
+detection_results/
+logs/
+
+# JSON output files (except package.json)
+*.json
+!package.json
+!tsconfig.json
+!next.config.js
+
+# Test reports
+test-report/
+coverage/
+
+
+# =============================================================================
+# IDEs / EDITORS
+# =============================================================================
+# VS Code
+.vscode/
+*.vscode
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains
+.idea/
+*.iml
+out/
+.idea_modules/
+
+# Vim
+*.swp
+*.swo
+*~
+.DS_Store
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-*
+
+# Atom
+.atom/
+
+
+# =============================================================================
+# OPERATING SYSTEM FILES
+# =============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Nautilus (GNOME)
+.nautilus/
+.metadata_never_index
+
+# Google Drive (macOS)
+.appledoublefile
+
+
+# =============================================================================
+# SECURITY-SENSITIVE FILES (MUST NEVER BE COMMITTED)
+# =============================================================================
+# NOTE: These exclusions are INTENTIONAL for security reasons.
+# Browser automation (nodriver) may store session cookies that could
+# expose authentication to AI detector services. These files must
+# NEVER be committed to prevent credential leakage.
+
+# Cookie/session files from browser automation
+gptzero.txt
+zerogpt.txt
+winston.txt
+originality.txt
+Verte.txt
+*.cookie
+*.session
+cookies.txt
+cookies.json
+
+# Cookie/session directories
+cookies/
+session_data/
+browser_sessions/
+auth_data/
+
+# Credentials and secrets
+credentials.json
+secrets/
+keys/
+*.key
+*.pem
+*.cert
+*.p12
+
+# Environment files with secrets (override the above patterns only for .env)
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# =============================================================================
+# BUILD OUTPUTS / COMPILATION
+# =============================================================================
+# General build outputs
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go
+*.test
+*.out
+vendor/
+
+# Rust
+target/
+Cargo.lock
+
+
+# =============================================================================
+# TEMPORARY / DEVELOPMENT FILES
+# =============================================================================
+# Debug and temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.patch
+
+# Temporary directories
+tmp/
+temp/
+temporary/
+
+# Backup files
+*~
+
+
+# =============================================================================
+# GIT
+# =============================================================================
+# Git internals
+.git/
+.gitignore  (keep this file!)
+.gitattributes
+.gitmodules
+
+# Git hooks (can be custom, so usually keep but ignore output)
+.git/hooks/
+.git/refs/
+
+# Git stash
+.git_stash
+
+
+# =============================================================================
+# GITHUB ACTIONS / CI/CD
+# =============================================================================
+# GitHub Actions workflow artifacts (in the repo root)
+!.github/
+
+# Build artifacts from CI
+.github/workflows/.cache/
+
+
+# =============================================================================
+# KEEP THESE FILES/DIRECTORIES
+# =============================================================================
+# The following files are intentionally tracked in git:
+
+# Sample test data - legitimate AI/human text samples
+!/samples/
+samples/*
+!samples/human-text.txt
+!samples/ai-text.txt
+
+# Test fixtures - keep test fixtures for testing
+!/tests/fixtures/
+tests/fixtures/*
+!tests/fixtures/.gitkeep
+
+# Kilo configuration (keep the config, ignore cache)
+!.kilocode/
+!.kilocode/config.yaml
+!.kilocode/skills/
+!.kilocode/skills/slop-reviewer/
+!.kilocode/skills/slop-reviewer/SKILL.md
+!.kilocode/skills/stop-slop/
+!.kilocode/skills/stop-slop/SKILL.md
+
+# GitHub Actions workflows
+!.github/workflows/
+
+# Documentation (keep these markdown files)
+!/AI-DETECTION.md
+!/SKILL.md
+!/README.md
+!/AGENTS.md
+
+
+# =============================================================================
+# EXTRAS
+# =============================================================================
+# Terraform (if used)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.*
+
+# Docker (if used)
+.docker/
+docker-compose.override.yml
+
+# Vagrant (if used)
+.vagrant/
+*.vagrant/
+.vagrant.d/
+
