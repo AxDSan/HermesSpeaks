@@ -1,0 +1,7 @@
+name = "stop-slop-drop-top"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".vercel/output/static"
+
+[env.production]
+vars = { NEXT_RUNTIME = "edge" }
+compatibility_flags = ["nodejs_compat"]

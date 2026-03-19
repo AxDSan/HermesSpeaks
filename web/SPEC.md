@@ -1,0 +1,601 @@
+# SPEC.md — Stop Slop Drop Top: WebLLM A/B Testing Feature
+
+## 1. Concept & Vision
+
+A sophisticated in-browser AI writing analysis tool that lets users compare how different "writing philosophy" instruction sets (SKILL.md files) transform text. Think of it as a scientific instrument for understanding what makes writing feel "human" vs "AI."
+
+**Core metaphor:** A/B testing lab for writing styles — feed the same text through two different lenses of writing philosophy and observe the differences.
+
+**Emotional tone:** Clinical yet approachable. Like a well-designed medical device — precise, trustworthy, but not intimidating.
+
+---
+
+## 2. Design Language
+
+### Aesthetic Direction
+Inspired by professional audio mixing software ( Ableton Live, Logic Pro ) — dark interface with high-contrast indicators, clear visual hierarchy, and purposeful use of color to encode meaning.
+
+### Color Palette
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `background` | `#0f0f0f` | Main app background |
+| `surface` | `#1a1a1a` | Cards, panels |
+| `surface-elevated` | `#252525` | Modals, dropdowns |
+| `border` | `#333333` | Dividers, outlines |
+| `text-primary` | `#f5f5f5` | Main text |
+| `text-secondary` | `#a0a0a0` | Labels, hints |
+| `accent` | `#6366f1` | Primary actions (indigo) |
+| `accent-hover` | `#818cf8` | Hover states |
+| `success` | `#22c55e` | Human score, positive indicators |
+| `warning` | `#eab308` | Medium scores, cautions |
+| `danger` | `#ef4444` | AI score, negative indicators |
+| `output-a` | `#3b82f6` | Output A indicator (blue) |
+| `output-b` | `#a855f7` | Output B indicator (purple) |
+
+### Typography
+
+| Element | Font | Size | Weight |
+|---------|------|------|--------|
+| Headings | Inter | 24px/20px/16px | 600 |
+| Body | Inter | 14px | 400 |
+| Code/System | JetBrains Mono | 13px | 400 |
+| Labels | Inter | 12px | 500 |
+| Stats | JetBrains Mono | 20px | 600 |
+
+### Spatial System
+
+- Base unit: 4px
+- Component padding: 16px (4 units)
+- Section gaps: 24px (6 units)
+- Panel border-radius: 8px
+- Button border-radius: 6px
+
+### Motion Philosophy
+
+| Interaction | Animation |
+|-------------|-----------|
+| Panel appear | Fade + slide up, 200ms ease-out |
+| Button press | Scale 0.98, 100ms |
+| Loading pulse | Opacity 0.5-1.0, 1.5s infinite |
+| Progress bar | Width transition, 300ms ease-out |
+| Vote confirmation | Scale 1.0 → 1.1 → 1.0, 300ms spring |
+| Text streaming | Character-by-character append, 20ms |
+
+### Visual Assets
+- **Icons:** Lucide React (consistent stroke width)
+- **Model status indicator:** Custom SVG brain icon with pulse animation when loading
+- **A/B badges:** Pill-shaped with colored left border
+- **Vote buttons:** Radio-button style with fill animation
+
+---
+
+## 3. Layout & Structure
+
+### Page Structure
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HEADER                                                                     │
+│ ┌─────────────────────────────┐  ┌──────────────────────────────────────┐  │
+│ │ Logo + "SKILL Lab"          │  │ Model: Qwen2-1.5B ▼ │ [Clear] [?]   │  │
+│ └─────────────────────────────┘  └──────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ INPUT SECTION                                                              │
+│ ┌─────────────────────────────────────────────────────────────────────────┐│
+│ │ Enter text to transform...                                              ││
+│ │ [Textarea - 200px min height, auto-grow]                               ││
+│ └─────────────────────────────────────────────────────────────────────────┘│
+│ [Load Sample] [Load from URL] [Clear]                    Characters: 0     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ SKILL CONFIGURATION                                                        │
+│ ┌────────────────────────────────┐  ┌────────────────────────────────────┐│
+│ │ SKILL A (Active)               │  │ SKILL B (Optional)                 ││
+│ │ Name: [Humanize v1]           │  │ Name: [Academic]                   ││
+│ │ [SKILL.md content...]         │  │ [SKILL.md content...]             ││
+│ │ [Load File] [Use Default]     │  │ [Load File] [Use Default] [×]    ││
+│ └────────────────────────────────┘  └────────────────────────────────────┘│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ACTION BAR                                                                 │
+│        [ ▶ Run A/B Test ]                    Model: Qwen2-1.5B-Instruct   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ OUTPUT COMPARISON (appears after run)                                       │
+│ ┌────────────────────────────────┐  ┌────────────────────────────────────┐│
+│ │ OUTPUT A                    ▲  │  │ OUTPUT B                       ▲  ││
+│ │ Generated by: Humanize v1     │  │ │ Generated by: Academic           ││
+│ │ ──────────────────────────── │  │ ────────────────────────────       ││
+│ │ The transformed text appears  │  │ The transformed text appears      ││
+│ │ here character by character   │  │ here character by character        ││
+│ │ ──────────────────────────── │  │ ────────────────────────────       ││
+│ │ Stats: 342 chars │ 2.1s     │  │ Stats: 298 chars │ 1.8s           ││
+│ │ [Vote A] [Tie] [Copy]        │  │ [Vote B] [Tie] [Copy]              ││
+│ └────────────────────────────────┘  └────────────────────────────────────┘│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ VOTING & RESULTS                                                           │
+│ ┌─────────────────────────────────────────────────────────────────────────┐│
+│ │ Current Experiment                                                       ││
+│ │ [A] ████████████████░░░░░░░░░ 58%    [B] ██████████░░░░░░░░░░ 35% │ │
+│ │       [Tie] ██████░░░░░░░░░░░░ 7%                                   │ │
+│ │ [View History] [Export Results]                                        ││
+│ └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Responsive Strategy
+
+| Breakpoint | Layout Change |
+|------------|---------------|
+| `≥1024px` | Side-by-side A/B outputs |
+| `768-1023px` | Stacked outputs, 50% width each |
+| `<768px` | Full-width stacked, collapsible panels |
+
+---
+
+## 4. Features & Interactions
+
+### 4.1 Input Section
+
+**Textarea Input**
+- Placeholder: "Enter text to transform... (paste an AI-written paragraph)"
+- Auto-grows from 200px to 400px max
+- Character count displayed bottom-right
+- Keyboard shortcut: `Cmd/Ctrl + Enter` to run
+
+**Load Sample Button**
+- Opens dropdown with presets:
+  - "AI-generated paragraph" (includes AI patterns)
+  - "Formal academic prose"
+  - "Marketing copy"
+  - "Technical documentation"
+
+### 4.2 SKILL Configuration
+
+**SKILL A (Required)**
+- Name field: Editable text, defaults to "SKILL A"
+- Content textarea: Full SKILL.md content, monospace font, 300px height
+- Load File button: Accepts `.md` files via file picker
+- Use Default button: Loads project's built-in SKILL.md
+
+**SKILL B (Optional)**
+- Same as SKILL A, but shows "× Remove" button
+- Can be empty (grayed out panel)
+- If empty, only Output A is generated
+
+### 4.3 Model Selection
+
+**Model Dropdown**
+- Options:
+  - `Qwen2-1.5B-Instruct` (default, recommended)
+  - `Phi-3-mini` (better quality, larger)
+  - `Llama-3.2-1B-Instruct`
+  - `SmolLM2-1.7B` (fastest, lower quality)
+
+**Model Status Indicator**
+- `idle` — Gray dot
+- `downloading` — Blue pulsing dot + percentage
+- `loading` — Yellow pulsing dot + "Initializing..."
+- `ready` — Green dot + model name
+- `error` — Red dot + error message
+
+### 4.4 Run A/B Test Button
+
+**States:** disabled, ready, running, complete
+
+**Click Behavior:**
+1. Validate inputs
+2. Generate Output A using SKILL A
+3. Generate Output B using SKILL B (if present)
+4. Display outputs with streaming effect
+5. Enable voting buttons
+
+### 4.5 Output Panels
+
+**Output A Panel**
+- Blue left border
+- Header: "OUTPUT A" + "Generated by: [Skill Name]"
+- Content area: Monospace font, preserved whitespace
+- Line-by-line streaming display
+- Stats footer: Character count, generation time
+
+**Output B Panel**
+- Purple left border
+- Same structure as Output A
+- Hidden if SKILL B not configured
+
+### 4.6 Voting System
+
+**Vote Buttons (per output)**
+- `[Vote A]` / `[Vote B]` — Radio-style, mutually exclusive
+- `[Tie]` — Available after voting for one side
+- After voting: Selected button fills with color
+
+**Results Display**
+- Horizontal bar chart: |████ A ████░░ B ██░ Tie|
+- Percentages update in real-time
+
+### 4.7 History Panel
+
+**Collapsed State**
+- Shows "History (N experiments)" header
+- Click to expand
+
+**Expanded State**
+- Table/list of past experiments
+- Columns: #, Skills Compared, Winner, Timestamp
+
+**Export Options**
+- "Export All" — Downloads JSON
+- "Export CSV" — Tabular format
+- "Clear History" — Confirmation required
+
+---
+
+## 5. Component Inventory
+
+| Component | States |
+|-----------|--------|
+| Header | Default |
+| TextInput | empty, focused, filled, error, disabled |
+| SkillPanel | active, empty, invalid, loading |
+| ModelSelector | idle, downloading, loading, ready, error, open |
+| RunButton | disabled, ready, hover, active, running, success |
+| OutputPanel | empty, loading, streaming, complete, error |
+| VoteButton | default, hover, selected, disabled |
+| VoteBar | no votes, in progress, complete, winner |
+| HistoryRow | default, hover, expanded |
+
+---
+
+## 6. Technical Approach
+
+### Stack
+- Next.js 14 (App Router)
+- TypeScript (strict mode)
+- Tailwind CSS (dark theme)
+- Zustand for state management
+- WebLLM for in-browser LLM inference
+
+### Project Structure
+```
+web/
+├── app/
+│   ├── page.tsx
+│   ├── layout.tsx
+│   ├── globals.css
+├── components/
+│   ├── Header.tsx
+│   ├── TextInput.tsx
+│   ├── SkillPanel.tsx
+│   ├── ModelSelector.tsx
+│   ├── RunButton.tsx
+│   ├── OutputPanel.tsx
+│   ├── VoteSection.tsx
+│   ├── HistoryPanel.tsx
+│   └── HelpModal.tsx
+├── lib/
+│   ├── detector.ts
+│   ├── webllm.ts
+│   ├── prompt-builder.ts
+│   └── store.ts
+├── hooks/
+│   ├── useWebLLM.ts
+│   ├── useExperiment.ts
+│   └── useLocalStorage.ts
+└── types/
+    └── index.ts
+```
+
+### Data Models
+
+```typescript
+interface Skill {
+  id: 'a' | 'b';
+  name: string;
+  content: string;
+  source: 'default' | 'file' | 'url' | 'manual';
+}
+
+interface Experiment {
+  id: string;
+  timestamp: number;
+  inputText: string;
+  skillA: Skill;
+  skillB: Skill | null;
+  outputA: string;
+  outputB: string | null;
+  outputAStats: { chars: number; timeMs: number };
+  outputBStats: { chars: number; timeMs: number } | null;
+  votes: { a: number; b: number; tie: number };
+  winner: 'a' | 'b' | 'tie' | null;
+  modelUsed: string;
+}
+
+type ModelStatus = 'idle' | 'downloading' | 'loading' | 'ready' | 'error';
+```
+
+### WebLLM Integration
+
+```typescript
+// web/lib/webllm.ts
+import * as webllm from '@mlc-ai/web-llm';
+
+const MODEL_CONFIGS = {
+  'Qwen2-1.5B-Instruct': {
+    modelId: 'Qwen2-1.5B-Instruct-q4f16_1-MLC',
+    description: 'Fast, good quality',
+  },
+  'Phi-3-mini': {
+    modelId: 'Phi-3-mini-q4f16_1-MLC',
+    description: 'Better quality, larger',
+  },
+};
+
+class WebLLMManager {
+  private engine: any = null;
+  private currentModel: string = '';
+
+  async loadModel(modelId: string, onProgress: (pct: number, text: string) => void) {
+    const config = MODEL_CONFIGS[modelId];
+    if (!config) throw new Error(`Unknown model: ${modelId}`);
+
+    this.engine = await webllm.CreateMLCEngine(config.modelId, {
+      initProgressCallback: (progress: any) => {
+        const pct = Math.round(progress.progress * 100);
+        onProgress(pct, progress.text);
+      },
+    });
+    this.currentModel = modelId;
+  }
+
+  async generate(systemPrompt: string, userInput: string): Promise<string> {
+    if (!this.engine) throw new Error('Model not loaded');
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userInput },
+    ];
+
+    const final = await this.engine.chat.completions.create({
+      messages,
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+    
+    return final.choices[0].message.content;
+  }
+
+  unload(): void {
+    if (this.engine) {
+      this.engine.terminate();
+      this.engine = null;
+    }
+  }
+}
+
+export const webllmManager = new WebLLMManager();
+```
+
+### Prompt Builder
+
+```typescript
+// web/lib/prompt-builder.ts
+
+export function buildSystemPrompt(skillName: string, skillContent: string): string {
+  return `You are an expert prose editor following the "${skillName}" writing philosophy.
+
+## Your Task
+Rewrite the provided text according to the rules below.
+
+## Writing Rules (${skillName})
+${skillContent}
+
+## Critical Instructions
+1. Output ONLY the rewritten text - no explanations
+2. Preserve the approximate length of the original (within 20%)
+3. Maintain the original's tone
+4. Do not add new information
+
+## Text to Rewrite:
+`;
+}
+
+export function buildUserMessage(inputText: string): string {
+  return inputText;
+}
+```
+
+### Dependencies
+
+```json
+{
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "@mlc-ai/web-llm": "^0.2.0",
+    "zustand": "^4.5.0",
+    "lucide-react": "^0.400.0"
+  }
+}
+```
+
+---
+
+## 7. User Flows
+
+### First-Time User Flow
+1. User visits site → Sees empty input + default SKILL A loaded
+2. User pastes AI-generated text
+3. User clicks "Run A/B Test"
+4. Model downloads (if first time) → Progress shown
+5. Output A streams in
+6. User reads output
+7. User votes → Submits → Saved to history
+
+### Comparison Flow
+1. User loads two SKILLs (A + B)
+2. Runs experiment
+3. Side-by-side outputs appear
+4. User reads both carefully
+5. User votes: A, B, or Tie
+6. User clicks "Submit & Next"
+
+---
+
+## 8. Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd/Ctrl + Enter` | Run experiment |
+| `1` | Vote for A |
+| `2` | Vote for B |
+| `3` | Vote Tie |
+| `Esc` | Close modals |
+| `?` | Open help |
+
+---
+
+## 9. Error States
+
+| Error | Message | Resolution |
+|-------|---------|------------|
+| Model load failed | "Failed to load model. Check internet." | Retry button |
+| Generation failed | "Generation failed. Try again." | Retry button |
+| Invalid SKILL | "SKILL content too short." | Highlight field |
+| Empty input | "Enter text to transform." | Highlight field |
+| Browser unsupported | "Your browser doesn't support WebLLM." | Link to docs |
+
+---
+
+## 10. Future Enhancements
+
+| Feature | Priority |
+|---------|----------|
+| Cloud sync (Supabase) | P2 |
+| Team collaboration | P2 |
+| Model fine-tuning | P3 |
+| Batch experiments | P3 |
+| A/B/C testing | P3 |
+| Export to Notion/Google Docs | P2 |
+
+---
+
+## 11. Multi-Provider LLM Support
+
+### Overview
+
+SKILL Lab now supports multiple LLM providers, allowing users to choose the best option for their needs:
+
+| Provider | Description | API Key Required | Models |
+|----------|-------------|------------------|--------|
+| **WebLLM** | Local browser inference | No | Qwen 2 1.5B, Phi-3 Mini, Llama 3.2 1B, SmolLM 2 1.7B |
+| **OpenAI** | GPT-4o, GPT-4o-mini, o3-mini | Yes | GPT-4o, GPT-4o Mini, GPT-4 Turbo, o3 Mini |
+| **Claude** | Anthropic's Claude models | Yes | Claude Opus 4, Claude 3.5 Sonnet, Claude 3.5 Haiku |
+| **Gemini** | Google's Gemini models | Yes | Gemini 2.0 Flash, Gemini 1.5 Pro, Gemini 1.5 Flash |
+| **OpenRouter** | Unified access to 100+ models | Yes | GPT-4o, Claude 3.5 Sonnet, Gemini 2.0 Flash, Llama 3 70B |
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Provider Abstraction Layer                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    llm-providers.ts                             │   │
+│  │  - generateWithProvider()                                        │   │
+│  │  - Unified interface for all providers                           │   │
+│  │  - Error handling and validation                                 │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                    │              │              │              │       │
+│         ┌──────────┘              │              └──────────────┘       │
+│         ▼                         ▼                         ▼         │
+│  ┌────────────┐          ┌────────────┐           ┌────────────┐       │
+│  │  WebLLM   │          │  OpenAI   │           │  Claude   │       │
+│  │  (Local)  │          │   API     │           │    API    │       │
+│  └────────────┘          └────────────┘           └────────────┘       │
+│         │                         │                         │         │
+│         ▼                         │                         ▼         │
+│  ┌────────────┐                   │                  ┌────────────┐   │
+│  │  Gemini   │                   │                  │ OpenRouter │   │
+│  │   API    │                   │                  │    API     │   │
+│  └────────────┘                   │                  └────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### WebLLM (Local)
+
+**Benefits:**
+- No API costs
+- Complete privacy (data never leaves browser)
+- Works offline after initial model download
+
+**Requirements:**
+- WebGPU support (Chrome 113+, Edge 113+)
+- ~1-2GB storage for model cache
+- 4GB+ available RAM
+
+**Model Download:**
+- Automatic on first use
+- Progress indicator during download
+- Models cached in IndexedDB
+
+**WebGPU Error Handling:**
+- Clear error message if WebGPU unavailable
+- Suggests using Chrome/Edge with hardware acceleration
+- Falls back to API providers if WebGPU fails
+
+### API Providers
+
+**Common Setup:**
+1. Click the Key icon next to provider selector
+2. Enter API key
+3. Key stored locally in browser (localStorage)
+4. Never sent to our servers
+
+**Provider-Specific Details:**
+
+#### OpenAI
+- Endpoint: `https://api.openai.com/v1/chat/completions`
+- Models: gpt-4o, gpt-4o-mini, gpt-4-turbo, o3-mini
+- Get key: https://platform.openai.com/api-keys
+
+#### Claude
+- Endpoint: `https://api.anthropic.com/v1/messages`
+- Models: claude-opus-4-5, claude-3-5-sonnet-6, claude-3-5-haiku-3
+- Get key: https://console.anthropic.com/settings/keys
+
+#### Gemini
+- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`
+- Models: gemini-2.0-flash, gemini-1.5-pro, gemini-1.5-flash
+- Get key: https://aistudio.google.com/app/apikey
+
+#### OpenRouter
+- Endpoint: `https://openrouter.ai/api/v1/chat/completions`
+- Models: Access to 100+ models from various providers
+- Get key: https://openrouter.ai/keys
+- Note: May require credit on OpenRouter
+
+### Security & Privacy
+
+| Provider | Data Sent To | Privacy |
+|----------|-------------|---------|
+| WebLLM | None (local) | Full privacy |
+| OpenAI | OpenAI servers | Subject to OpenAI privacy policy |
+| Claude | Anthropic servers | Subject to Anthropic privacy policy |
+| Gemini | Google servers | Subject to Google privacy policy |
+| OpenRouter | OpenRouter servers | Subject to OpenRouter privacy policy |
+
+### Provider Selection UI
+
+The provider selector in the header allows quick switching between:
+- Provider (WebLLM, OpenAI, Claude, Gemini, OpenRouter)
+- Model (filtered by provider)
+- API key configuration (via Key icon)
+
+### Future Enhancements
+
+| Feature | Priority | Notes |
+|---------|----------|-------|
+| Streaming output | P1 | Show text as it's generated |
+| Usage/cost tracking | P2 | Track API costs |
+| Custom model configs | P2 | Temperature, max tokens, etc. |
+| API key validation | P2 | Test key on save |
+| Provider comparison mode | P3 | Same SKILL through multiple providers |
