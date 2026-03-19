@@ -105,7 +105,7 @@ jobs:
 
           // Prepare OpenRouter API request
           const requestBody = JSON.stringify({
-            model: "openrouter/minimax/m2.5",
+            model: "minimax/minimax-m2.5:free",
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt }
