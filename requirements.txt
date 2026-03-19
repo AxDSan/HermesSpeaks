@@ -1,0 +1,5 @@
+# Python dependencies for AI detection
+# This file locks Python dependencies instead of hardcoding versions in npm scripts.
+# Install with: pip install -r requirements.txt
+
+nodriver==0.0.80
