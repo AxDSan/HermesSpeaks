@@ -1,0 +1,218 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        id: npm-audit
+        run: |
+          npm audit --audit-level=moderate --json > audit-results.json 2>&1 || true
+          cat audit-results.json | jq -r '
+            {
+              vulnerabilities: .vulnerabilities,
+              metadata: .metadata
+            }
+          ' > audit-summary.json
+          
+          # Count vulnerabilities by severity
+          VULN_COUNT=$(jq -r '.metadata.vulnerabilities.total // 0' audit-summary.json)
+          HIGH_COUNT=$(jq -r '.metadata.vulnerabilities.high // 0' audit-summary.json)
+          MODERATE_COUNT=$(jq -r '.metadata.vulnerabilities.moderate // 0' audit-summary.json)
+          LOW_COUNT=$(jq -r '.metadata.vulnerabilities.low // 0' audit-summary.json)
+          
+          echo "vuln_count=$VULN_COUNT" >> $GITHUB_OUTPUT
+          echo "high_count=$HIGH_COUNT" >> $GITHUB_OUTPUT
+          echo "moderate_count=$MODERATE_COUNT" >> $GITHUB_OUTPUT
+          echo "low_count=$LOW_COUNT" >> $GITHUB_OUTPUT
+          
+          echo "Vulnerabilities found:"
+          echo "  High: $HIGH_COUNT"
+          echo "  Moderate: $MODERATE_COUNT"
+          echo "  Low: $LOW_COUNT"
+          echo "  Total: $VULN_COUNT"
+
+      - name: Check Node.js version for security issues
+        run: |
+          NODE_VERSION=$(node --version)
+          echo "Using Node.js version: $NODE_VERSION"
+          
+          # Check if Node.js version is LTS and not end-of-life
+          # Node.js 18 (Hydrogen) LTS until April 2025
+          # Node.js 20 (Iron) LTS until April 2026
+          if [[ "$NODE_VERSION" == "v18."* ]]; then
+            echo "Node.js 18 is LTS but approaching EOL in April 2025"
+          elif [[ "$NODE_VERSION" == "v20."* ]]; then
+            echo "Node.js 20 is current LTS"
+          elif [[ "$NODE_VERSION" == "v22."* ]]; then
+            echo "Node.js 22 is current"
+          else
+            echo "Warning: Node.js version may be outdated"
+          fi
+
+      - name: Check package.json for suspicious scripts
+        id: check-scripts
+        run: |
+          # Define suspicious patterns
+          SUSPICIOUS_PATTERNS=(
+            "eval("
+            "child_process"
+            "require('child_process')"
+            "exec("
+            "spawn("
+            "https://"
+            "http://"
+            "curl "
+            "wget "
+            "rm -rf"
+            "chmod 777"
+            "base64"
+          )
+          
+          echo "Checking package.json scripts for suspicious patterns..."
+          
+          # Check scripts in package.json
+          for pattern in "${SUSPICIOUS_PATTERNS[@]}"; do
+            if jq -r '.scripts | to_entries[] | .value' package.json 2>/dev/null | grep -qi "$pattern"; then
+              echo "WARNING: Suspicious pattern found: $pattern"
+              echo "found_suspicious=true" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          done
+          
+          echo "found_suspicious=false" >> $GITHUB_OUTPUT
+          echo "package.json scripts look clean"
+
+      - name: Fail on high severity vulnerabilities
+        if: steps.npm-audit.outputs.high_count > 0
+        run: |
+          echo "High severity vulnerabilities found!"
+          echo "Please address high severity vulnerabilities before merging."
+          exit 1
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-results
+          path: |
+            audit-results.json
+            audit-summary.json
+          retention-days: 30
+
+      - name: Create PR comment with security findings
+        if: github.event_name == 'pull_request'
+        run: |
+          # Get the counts from previous step
+          VULN_COUNT=${{ steps.npm-audit.outputs.vuln_count }}
+          HIGH_COUNT=${{ steps.npm-audit.outputs.high_count }}
+          MODERATE_COUNT=${{ steps.npm-audit.outputs.moderate_count }}
+          LOW_COUNT=${{ steps.npm-audit.outputs.low_count }}
+          
+          # Create comment body
+          COMMENT_BODY="## Security Audit Results
+          
+          ### Vulnerability Summary
+          | Severity | Count |
+          |----------|-------|
+          | High | $HIGH_COUNT |
+          | Moderate | $MODERATE_COUNT |
+          | Low | $LOW_COUNT |
+          | **Total** | **$VULN_COUNT** |
+          "
+          
+          if [ "$HIGH_COUNT" -gt 0 ]; then
+            COMMENT_BODY="$COMMENT_BODY
+          ### ⚠️ High Severity Vulnerabilities Found
+          
+          This PR contains high severity vulnerabilities that must be addressed before merging.
+          
+          Please run \`npm audit fix\` to resolve these issues, or review the vulnerability details and update affected packages manually.
+          "
+          elif [ "$VULN_COUNT" -gt 0 ]; then
+            COMMENT_BODY="$COMMENT_BODY
+          ### ℹ️ Vulnerabilities Found (Non-blocking)
+          
+          Moderate or low severity vulnerabilities were detected. These do not block merging but should be addressed.
+          
+          Run \`npm audit fix\` to resolve these issues.
+          "
+          else
+            COMMENT_BODY="$COMMENT_BODY
+          ### ✅ No Vulnerabilities Found
+          
+          The security audit passed with no known vulnerabilities.
+          "
+          fi
+          
+          COMMENT_BODY="$COMMENT_BODY
+          ---
+          *Automated security audit by GitHub Actions*"
+          
+          # Post comment to PR
+          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_BODY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Review dependencies for vulnerabilities
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-fail
+
+  code-scanning:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit for Code Scanning
+        run: npm audit --audit-level=high --json > npm-audit-results.json
+
+      - name: Upload results to GitHub Security
+        uses: github/codeql-action/upload-security-results@v3
+        with:
+          category: '/language:javascript'
+          upload: always
+          file_path: npm-audit-results.json
