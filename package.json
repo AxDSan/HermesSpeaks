@@ -11,7 +11,11 @@
     "detect:all": "node detect-ai.js --detectors heuristic,gptzero,zerogpt,winston,originality",
     "detect:compact": "node detect-ai.js --compact",
     "detect:json": "node detect-ai.js --json",
+<<<<<<< HEAD
+    "test:slop": "node test-slop-removal.js --input samples/ai-text.txt",
+=======
     "test:slop": "node test-slop-removal.js",
+>>>>>>> origin/main
     "python:detector": "source .venv/bin/activate && python python/stealth_detector.py",
     "install:python": "pip install nodriver==0.47.0"
   },
@@ -34,7 +38,11 @@
   },
   "homepage": "https://github.com/tomkabel/stop-slop-drop-top#readme",
   "dependencies": {
+<<<<<<< HEAD
+    "chalk": "^4.1.2",
+=======
     "chalk": "^5.0.0",
+>>>>>>> origin/main
     "commander": "^12.1.0"
   }
 }
