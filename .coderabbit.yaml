@@ -1,0 +1,46 @@
+# CodeRabbit AI PR Review Configuration
+# https://docs.coderabbit.ai/
+
+language: en
+
+early_access: true
+
+reviews:
+  profile: default
+  request_changes_workflow: true
+  high_level_summary: true
+  review_status: true
+  poem: true
+  collapseWalkthrough: false
+  auto_review_title: true
+
+annotations:
+  pattern: "\\.(js|ts|jsx|tsx|py|md|yml|yaml|json)$"
+  exclude:
+    - "**/node_modules/**"
+    - "**/.next/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/*.min.js"
+    - "**/coverage/**"
+
+checks:
+  complexity:
+    enabled: true
+    exclude:
+      - "**/node_modules/**"
+      - "**/tests/**"
+  missing-docs:
+    enabled: true
+    exclude:
+      - "**/node_modules/**"
+      - "**/*.test.js"
+      - "**/*.test.ts"
+
+chat:
+  auto_reply: true
+
+code_clans:
+  enable: true
+
+version: "2"
