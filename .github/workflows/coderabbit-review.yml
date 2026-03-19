@@ -1,0 +1,48 @@
+name: CodeRabbit AI Review
+
+on:
+  pull_request:
+    branches: [main, dev]
+  pull_request_target:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  coderabbit-review:
+    name: CodeRabbit AI Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run CodeRabbit AI Review
+        uses: coderabbitai/coderabbitai-action@v2
+        with:
+          config: .coderabbit.yaml
+          language: en
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODERABBITAI_TOKEN: ${{ secrets.CODERABBITAI_TOKEN }}
+
+      - name: Generate Review Summary
+        if: always()
+        run: |
+          echo "## CodeRabbit AI Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "CodeRabbit AI has analyzed your PR and provided feedback." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Review Features" >> $GITHUB_STEP_SUMMARY
+          echo "- AI-powered code review" >> $GITHUB_STEP_SUMMARY
+          echo "- Security vulnerability detection" >> $GITHUB_STEP_SUMMARY
+          echo "- Code quality suggestions" >> $GITHUB_STEP_SUMMARY
+          echo "- Complexity analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Setup Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "1. Get your API key from [CodeRabbit AI](https://app.coderabbit.ai)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Add `CODERABBITAI_TOKEN` as a repository secret" >> $GITHUB_STEP_SUMMARY
+          echo "3. The review will run automatically on PRs" >> $GITHUB_STEP_SUMMARY
