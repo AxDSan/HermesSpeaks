@@ -1,0 +1,179 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          exclude: |
+            .env
+            secrets/**
+            *.pem
+            *.key
+            **/secrets/**
+            **/.env*
+            **/credentials*
+            **/*.log
+
+      - name: Get diff for changed files
+        id: get-diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Get the base and head commit SHA
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          
+          # Check if files were changed
+          if [ -z "${{ steps.changed-files.outputs.all_changed_files }}" ]; then
+            echo "No files to review"
+            echo "diff=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Get the diff between base and head
+          DIFF=$(git diff --no-color $BASE_SHA...$HEAD_SHA 2>/dev/null || git diff --no-color $BASE_SHA HEAD 2>/dev/null || echo "")
+          
+          # Limit diff size to avoid API limits (first 100KB)
+          if [ ${#DIFF} -gt 102400 ]; then
+            DIFF=$(echo "$DIFF" | head -c 102400)
+            DIFF="$DIFF\n\n[... Truncated due to size limits ...]"
+          fi
+          
+          echo "diff=$DIFF" >> $GITHUB_OUTPUT
+
+      - name: Get PR details
+        id: pr-details
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Get PR title and description
+          PR_TITLE=$(gh pr view $PR_NUMBER --repo $REPO --json title -q '.title')
+          PR_BODY=$(gh pr view $PR_NUMBER --repo $REPO --json body -q '.body')
+          
+          echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "pr_body=${PR_BODY:-No description}" >> $GITHUB_OUTPUT
+
+      - name: Call OpenRouter API for code review
+        id: ai-review
+        if: steps.get-diff.outputs.diff != ''
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PR_TITLE: ${{ steps.pr-details.outputs.pr_title }}
+          PR_BODY: ${{ steps.pr-details.outputs.pr_body }}
+          DIFF: ${{ steps.get-diff.outputs.diff }}
+        run: |
+          # Create JSON payload for OpenRouter API
+          PAYLOAD=$(jq -n \
+            --arg model "minimax/minimax-m2.5" \
+            --arg title "$PR_TITLE" \
+            --arg body "$PR_BODY" \
+            --arg diff "$DIFF" \
+            '{
+              model: $model,
+              messages: [
+                {
+                  role: "system",
+                  content: "You are an expert code reviewer. Analyze pull request changes and provide constructive feedback focusing on:\n1. Security issues (SQL injection, XSS, hardcoded secrets, insecure deserialization, etc.)\n2. Bug detection (logic errors, null pointer issues, race conditions, etc.)\n3. Code quality (naming conventions, code complexity, duplicate code, etc.)\n4. Test coverage (missing tests, inadequate test cases, etc.)\n\nProvide a thorough review with specific, actionable feedback. Be concise but thorough. Use markdown formatting for better readability."
+                },
+                {
+                  role: "user",
+                  content: "Please review this pull request:\n\n**Title:** \($title)\n\n**Description:** \($body)\n\n**Changes:**\n\($diff)"
+                }
+              ],
+              temperature: 0.3,
+              max_tokens: 4000
+            }')
+          
+          # Call OpenRouter API
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://openrouter.ai/api/v1/chat/completions" \
+            -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -H "HTTP-Referer: https://github.com/$REPO" \
+            -H "X-Title: AI Code Review" \
+            -d "$PAYLOAD")
+          
+          # Extract HTTP status code and body
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          # Check if request was successful
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Error: API request failed with HTTP code $HTTP_CODE"
+            echo "Response: $BODY"
+            echo "review_comment<<EOF" >> $GITHUB_OUTPUT
+            echo "## AI Code Review" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "Unable to complete code review. Please review the changes manually." >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "Error details: HTTP $HTTP_CODE" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Parse the AI response
+          AI_REVIEW=$(echo "$BODY" | jq -r '.choices[0].message.content // empty')
+          
+          if [ -z "$AI_REVIEW" ]; then
+            echo "Error: Empty response from AI"
+            echo "review_comment<<EOF" >> $GITHUB_OUTPUT
+            echo "## AI Code Review" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "Unable to generate code review. Please review the changes manually." >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "review_comment<<EOF" >> $GITHUB_OUTPUT
+          echo "## AI Code Review 🤖" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "$AI_REVIEW" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "---" >> $GITHUB_OUTPUT
+          echo "*This review was generated by AI. Please verify the suggestions before merging.*" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post review comment
+        if: steps.ai-review.outputs.review_comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          REVIEW_COMMENT: ${{ steps.ai-review.outputs.review_comment }}
+        run: |
+          # Escape the comment for JSON
+          COMMENT=$(jq -Rs . <<< "$REVIEW_COMMENT")
+          
+          # Post comment to PR
+          gh pr comment $PR_NUMBER --repo $REPO --body "$COMMENT"
+
+      - name: Handle missing API key
+        if: secrets.OPENROUTER_API_KEY == ''
+        run: |
+          echo "Warning: OPENROUTER_API_KEY secret is not set. Skipping AI code review."
+          echo "To enable AI code review, add the OPENROUTER_API_KEY secret to this repository."
+
+      - name: Handle no files to review
+        if: steps.get-diff.outputs.diff == ''
+        run: |
+          echo "No files to review or all files were excluded (e.g., .env, secrets, .pem files)"
