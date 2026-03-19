@@ -12,6 +12,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 const { Command, Option } = require('commander');
 const { runDetection, printResults, printCompact, exportJSON, quickCheck } = require('./lib/detector-runner');
 

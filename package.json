@@ -1,0 +1,40 @@
+{
+  "name": "stop-slop-drop-top",
+  "version": "1.0.0",
+  "description": "AI detection testing CLI with slop removal, using nodriver for stealth browser automation",
+  "main": "index.js",
+  "scripts": {
+    "deploy:cloudflare": "cd web && npm run build && npx wrangler pages deploy .vercel/output/static",
+    "detect": "node detect-ai.js",
+    "detect:heuristic": "node detect-ai.js --detector heuristic",
+    "detect:gptzero": "node detect-ai.js --detector gptzero",
+    "detect:all": "node detect-ai.js --detectors heuristic,gptzero,zerogpt,winston,originality",
+    "detect:compact": "node detect-ai.js --compact",
+    "detect:json": "node detect-ai.js --json",
+    "test:slop": "node test-slop-removal.js --input samples/ai-text.txt",
+    "python:detector": "source .venv/bin/activate && python python/stealth_detector.py",
+    "install:python": "pip install nodriver==0.47.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomkabel/stop-slop-drop-top.git"
+  },
+  "keywords": [
+    "ai-detection",
+    "nodriver",
+    "stealth-browser",
+    "mcp",
+    "gptzero"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tomkabel/stop-slop-drop-top/issues"
+  },
+  "homepage": "https://github.com/tomkabel/stop-slop-drop-top#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0"
+  }
+}
