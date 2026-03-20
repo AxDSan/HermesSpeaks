@@ -89,7 +89,7 @@ const useStore = create<AppState>()(
       },
     }),
     {
-      name: 'stop-slop-lab-storage',
+      name: 'hermes-speaks-storage',
       partialize: (state) => ({
         // Never persist API keys
         experimentHistory: state.experimentHistory,

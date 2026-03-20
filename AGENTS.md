@@ -1,14 +1,14 @@
 ---
-name: stop-slop-drop-top
-description: AI detection testing CLI tool with slop removal capabilities
+name: hermes-speaks
+description: Remove AI slop patterns from text to make it sound human
 ---
 
-# Project Context: stop-slop-drop-top
+# Project Context: HermesSpeaks
 
-This is an AI detection testing CLI tool that:
-- Tests text against multiple AI detection services (GPTZero, ZeroGPT, Winston, Originality)
-- Provides a local heuristic detector for offline use
-- Includes a "slop removal" skill for eliminating AI writing patterns
+This is an AI slop removal tool that:
+- Removes AI writing patterns ("slop") from text to make it sound human
+- Provides local heuristic detection for identifying AI-generated text
+- Includes a lightweight CLI optimized for <500MB RAM (Fly.io compatible)
 
 ## Key Files
 
