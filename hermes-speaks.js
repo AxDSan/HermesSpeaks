@@ -32,7 +32,6 @@ program
   .option('--score', 'Show slop score before and after')
   .option('-j, --json', 'Output as JSON (for piping)')
   .option('--no-color', 'Disable colored output')
-  .option('--presets <list>', 'Apply specific presets (comma-separated): formal,casual,technical,creative')
   .action(async (textArg, options) => {
     try {
       const useColor = options.color !== false;
