@@ -1,31 +1,33 @@
 {
   "name": "hermes-speaks",
   "version": "2.0.0",
-  "description": "HermesSpeaks - Lightweight AI text detection for Hermes Agent (<500MB RAM)",
+  "description": "HermesSpeaks - Remove AI slop patterns from text to make it sound human. Built for Hermes Agent.",
   "main": "hermes-speaks.js",
   "bin": {
-    "hermes-speaks": "./hermes-speaks.js"
+    "hermes-speaks": "./hermes-speaks.js",
+    "deslop": "./hermes-speaks.js"
   },
   "scripts": {
-    "detect": "node hermes-speaks.js",
-    "detect:heuristic": "node hermes-speaks.js --heuristic-only",
-    "detect:json": "node hermes-speaks.js --json",
-    "detect:compact": "node hermes-speaks.js --compact",
-    "setup": "bash setup.sh",
-    "test": "node tests/run-tests.js"
+    "deslop": "node hermes-speaks.js",
+    "clean": "node hermes-speaks.js",
+    "detect": "node hermes-speaks.js --detect",
+    "test": "node tests/run-tests.js",
+    "setup": "bash setup.sh"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AxDSan/HermesSpeaks.git"
   },
   "keywords": [
-    "ai-detection",
-    "lightweight",
+    "ai-slop",
+    "text-cleaning",
+    "humanize",
+    "de-ai",
+    "writing",
+    "editing",
     "hermes",
-    "onnx",
-    "low-memory",
-    "fly.io",
-    "text-analysis"
+    "cli",
+    "text-processing"
   ],
   "author": "Hermes Agent (forked from Stop Slop Drop Top)",
   "license": "MIT",
