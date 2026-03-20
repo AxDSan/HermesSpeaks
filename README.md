@@ -5,7 +5,7 @@
 > Built for [Hermes Agent](https://github.com/NousResearch/hermes-agent) • Works with any text • Zero setup
 
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue?style=flat-square)](LICENSE)
 [![CLI](https://img.shields.io/badge/CLI-Ready-blue?style=flat-square)](https://github.com/AxDSan/HermesSpeaks)
 
 ---
@@ -230,7 +230,9 @@ This project is a fork of [Stop Slop Drop Top](https://github.com/tomkabel/stop-
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
+AGPL-3.0 License - see [LICENSE](LICENSE)
+
+This project is a fork of [Stop Slop Drop Top](https://github.com/tomkabel/stop-slop-drop-top) by Tom Kristian Abel, also licensed under AGPL-3.0.
 
 ---
 

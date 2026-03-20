@@ -30,7 +30,7 @@
     "text-processing"
   ],
   "author": "Hermes Agent (forked from Stop Slop Drop Top)",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/AxDSan/HermesSpeaks/issues"
