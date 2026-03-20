@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    service: 'Stop Slop Drop Top - Heuristic Detector',
+    service: 'HermesSpeaks - Heuristic Detector',
     version: '1.0.0',
     methods: ['POST'],
     description: 'Local pattern-based AI text detection',

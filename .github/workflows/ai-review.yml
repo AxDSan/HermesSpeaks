@@ -121,8 +121,8 @@ jobs:
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-              'HTTP-Referer': 'https://github.com/stop-slop-drop-top',
-              'X-Title': 'Stop Slop Drop Top AI Review'
+              'HTTP-Referer': 'https://github.com/AxDSan/HermesSpeaks',
+              'X-Title': 'HermesSpeaks AI Review'
             }
           };
 

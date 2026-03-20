@@ -1,4 +1,4 @@
-# SPEC.md — Stop Slop Drop Top: WebLLM A/B Testing Feature
+# SPEC.md — HermesSpeaks: WebLLM A/B Testing Feature
 
 ## 1. Concept & Vision
 

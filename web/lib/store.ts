@@ -427,7 +427,7 @@ Error handling shall follow the RESTful convention wherein HTTP status codes ind
       })),
     }),
     {
-      name: 'stop-slop-lab-storage',
+      name: 'hermes-speaks-storage',
       partialize: (state) => ({
         experimentHistory: state.experimentHistory,
         provider: state.provider,

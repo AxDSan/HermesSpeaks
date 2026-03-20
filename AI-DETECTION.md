@@ -7,7 +7,7 @@ This module provides tools to test text against AI detection services using **no
 ### Python Environment
 
 ```bash
-cd /path/to/stop-slop-drop-top
+cd /path/to/HermesSpeaks
 python3 -m venv .venv
 source .venv/bin/activate
 

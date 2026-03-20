@@ -1,6 +1,6 @@
-# Stop Slop Drop Top - Web App
+# HermesSpeaks - Web App
 
-Web interface for AI text detection using local heuristic analysis.
+Web interface for AI text detection and slop removal using local heuristic analysis.
 
 ## Quick Start
 
