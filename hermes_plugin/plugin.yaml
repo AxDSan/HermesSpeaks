@@ -1,0 +1,12 @@
+name: hermes-speaks
+version: 2.1.0
+description: "Remove AI slop patterns from text to make it sound human. Heuristic regex + LLM-powered detection and rewriting. Uses Hermes' own provider, no extra keys needed."
+author: Abdias J
+provides_tools:
+  - hermes_speaks_deslop
+  - hermes_speaks_detect
+  - hermes_speaks_rewrite
+  - hermes_speaks_heuristic_detect
+provides_hooks: []
+dependencies:
+  - pyyaml

@@ -29,6 +29,7 @@ program
   .option('-f, --file <path>', 'Read text from file')
   .option('-o, --output <path>', 'Write output to file (default: stdout)')
   .option('-d, --detect', 'Detect AI patterns instead of removing them')
+  .option('--heuristic-only', 'Skip ONNX detection, use heuristic only (fast)')
   .option('--score', 'Show slop score before and after')
   .option('-j, --json', 'Output as JSON (for piping)')
   .option('--no-color', 'Disable colored output')
@@ -75,7 +76,7 @@ program
       
       // Detection mode (secondary feature)
       if (options.detect) {
-        const results = await detect(text);
+        const results = await detect(text, { heuristicOnly: options.heuristicOnly });
         
         if (options.json) {
           console.log(JSON.stringify(results, null, 2));
